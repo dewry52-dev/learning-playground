@@ -56,7 +56,8 @@
           const list = document.createElement('ul');
           for (const record of records) {
             const item = document.createElement('li');
-            item.textContent = `${new Date(record.completed_at).toLocaleString('ko-KR')} · ${record.type} · 정답 ${record.correct}개 / 시도 ${record.attempts}번`;
+            const typeName = TYPES.find(type=>type[0]===record.type)?.[1] || '계산 연습';
+            item.textContent = `${new Date(record.completed_at).toLocaleString('ko-KR')} · ${typeName} · 정답 ${record.correct}개 / 시도 ${record.attempts}번`;
             list.append(item);
           }
           message.append(list);
