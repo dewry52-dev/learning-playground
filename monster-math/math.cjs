@@ -1,0 +1,6 @@
+const types=[['m21','두 자리 × 한 자리','23 × 4','곱셈'],['m31','세 자리 × 한 자리','124 × 3','곱셈'],['m22','두 자리 × 두 자리','24 × 13','곱셈'],['d21','두 자리 ÷ 한 자리','84 ÷ 3','나눗셈'],['d31','세 자리 ÷ 한 자리','126 ÷ 3','나눗셈'],['r21','두 자리 ÷ 한 자리 · 나머지','85 ÷ 3','나눗셈'],['r31','세 자리 ÷ 한 자리 · 나머지','127 ÷ 3','나눗셈']];
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+function question(type){if(!types.some(t=>t[0]===type))throw Error('계산 범위를 선택해 주세요.');let a,b,div=type[0]!=='m';if(!div){a=rnd(type==='m31'?100:10,type==='m31'?999:99);b=rnd(type==='m22'?10:2,type==='m22'?99:9);}else{b=rnd(2,9);const min=type.endsWith('31')?100:10,max=type.endsWith('31')?999:99;do{a=rnd(min,max);}while(type[0]==='r'?a%b===0:a%b!==0);}return {type,a,b,div,answer:div?Math.floor(a/b):a*b,remainder:div?a%b:0};}
+function correct(q,a,r=0){return Number.isSafeInteger(a)&&a===q.answer&&(!q.div||(Number.isSafeInteger(r)&&r===q.remainder));}
+function hint(q){if(q.div){const base=Math.floor(q.answer/10)*10;return `${q.b} × ${base||1} = ${q.b*(base||1)}부터 생각해 보세요. ${q.a} 안에 ${q.b}가 몇 묶음 들어갈까요? 남는 수는 ${q.b}보다 작아야 해요.`;}const tens=Math.floor(q.a/10)*10,ones=q.a%10;return `${q.a}를 ${tens}과 ${ones}(으)로 나눠 보세요. (${tens} × ${q.b}) + (${ones} × ${q.b})를 계산하면 돼요.`;}
+module.exports={types,question,correct,hint};

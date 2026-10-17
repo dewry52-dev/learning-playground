@@ -1,0 +1,17 @@
+const $=id=>document.getElementById(id),moods={happy:'😊',calm:'🌿',excited:'✨',sad:'🌧️',tired:'🌙'};
+let entries=[],id=null,dirty=false,busy=false;
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+function status(message){$('status').textContent=message}
+async function api(route='',options={}){const response=await fetch('/api/diary'+route,options);const value=await response.json();if(!response.ok)throw Error(value.error||'요청을 처리하지 못했어요.');return value}
+function render(){const search=$('search').value.toLowerCase(),month=$('month').value;const visible=entries.filter(e=>(e.title+' '+e.body).toLowerCase().includes(search)&&(!month||e.date.startsWith(month)));$('count').textContent=`${entries.length}장`;$('entries').replaceChildren();for(const e of visible){const button=document.createElement('button');button.type='button';button.className='entry';button.setAttribute('aria-current',String(id===e.id));const date=document.createElement('small'),title=document.createElement('strong'),preview=document.createElement('p');date.textContent=`${e.date} ${moods[e.mood]}`;title.textContent=e.title;preview.textContent=e.body;button.append(date,title,preview);button.onclick=()=>{if(canLeave())load(e)};$('entries').append(button)}if(!visible.length){const p=document.createElement('p');p.className='empty';p.textContent=entries.length?'검색 조건에 맞는 일기가 없어요.':'아직 모아 둔 하루가 없어요.\n첫 번째 이야기를 남겨 볼까요?';$('entries').append(p)}}
+function canLeave(){return !busy&&(!dirty||confirm('저장하지 않은 내용이 있어요. 이동하면 사라집니다. 이동할까요?'))}
+function load(entry){id=entry?.id??null;$('date').value=entry?.date||today();$('mood').value=entry?.mood||'happy';$('title').value=entry?.title||'';$('body').value=entry?.body||'';$('mode').textContent=id?'MY SAVED PAGE · 일기 수정':"TODAY'S PAGE · 새 일기";$('delete').hidden=!id;dirty=false;count();render();status('')}
+function count(){$('letters').textContent=`${$('body').value.length.toLocaleString()}자`}
+function lock(value){busy=value;for(const el of $('form').elements)el.disabled=value;$('new').disabled=value}
+$('form').addEventListener('input',()=>{dirty=true;count();status('아직 저장하지 않은 내용이 있어요.')});
+$('search').oninput=render;$('month').oninput=render;$('clear-filter').onclick=()=>{$('search').value='';$('month').value='';render()};
+$('new').onclick=()=>{if(canLeave()){load(null);$('title').focus()}};
+$('form').onsubmit=async event=>{event.preventDefault();if(busy)return;lock(true);status('로컬 폴더에 저장 중…');try{const data=Object.fromEntries(['date','mood','title','body'].map(key=>[key,$(key).value]));const saved=await api(id?`/${id}`:'',{method:id?'PUT':'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});entries=entries.filter(e=>e.id!==saved.id);entries.push(saved);entries.sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);load(saved);status('✓ 로컬 폴더에 저장했어요. 다시 열어도 기록이 남아 있어요.')}catch(error){status(error.message)}finally{lock(false)}};
+$('delete').onclick=async()=>{if(busy||!id||!confirm('이 일기를 삭제할까요? 삭제한 기록은 되돌릴 수 없어요.'))return;lock(true);try{await api(`/${id}`,{method:'DELETE'});entries=entries.filter(e=>e.id!==id);load(null);status('일기를 삭제했어요.')}catch(error){status(error.message)}finally{lock(false)}};
+window.addEventListener('beforeunload',event=>{if(dirty||busy){event.preventDefault();event.returnValue=''}});
+load(null);api().then(result=>{entries=result;render()}).catch(error=>status('일기를 불러오지 못했어요. 서버를 확인한 뒤 새로고침해 주세요. '+error.message));

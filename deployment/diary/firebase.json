@@ -1,0 +1,21 @@
+{
+  "firestore": {
+    "database":"diary",
+    "location":"asia-northeast3",
+    "edition":"enterprise",
+    "rules":"firestore.rules",
+    "indexes":"firestore.indexes.json"
+  },
+  "auth": {
+    "authorizedDomains":["classroom-diary-dewry52.web.app","classroom-diary-dewry52.firebaseapp.com","localhost"],
+    "providers": {
+      "googleSignIn": {"oAuthBrandDisplayName":"Classroom Diary"}
+    }
+  },
+  "emulators":{"firestore":{"port":8180},"ui":{"enabled":false},"singleProjectMode":true},
+  "hosting": {
+    "public":"dist",
+    "ignore":["**/.*","**/node_modules/**"],
+    "headers":[{"source":"**","headers":[{"key":"X-Content-Type-Options","value":"nosniff"},{"key":"Referrer-Policy","value":"no-referrer"},{"key":"Cache-Control","value":"no-store"}]}]
+  }
+}

@@ -40,4 +40,3 @@ node server.cjs
 보안 검토 범위와 운영 제한은 [SECURITY.md](SECURITY.md)를 참고하세요.
 
 PDF.js와 CMap의 원래 라이선스는 `math-gallery/pdf-counter/vendor/`에 보존되어 있습니다.
-

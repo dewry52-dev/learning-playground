@@ -1,0 +1,1 @@
+{"name":"monster-math-local","private":true,"scripts":{"start":"node server.cjs","test":"node test.cjs"}}

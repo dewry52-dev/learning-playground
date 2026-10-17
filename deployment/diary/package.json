@@ -1,0 +1,7 @@
+{
+  "name":"classroom-diary",
+  "private":true,
+  "scripts":{"build":"node build.mjs","test:rules":"node --test rules.test.mjs"},
+  "dependencies":{"firebase":"13.0.0"},
+  "devDependencies":{"esbuild":"0.28.2","@firebase/rules-unit-testing":"6.0.0"}
+}

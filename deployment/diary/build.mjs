@@ -1,0 +1,10 @@
+import {build} from 'esbuild';
+import fs from 'node:fs';
+import {fileURLToPath} from 'node:url';
+process.chdir(fileURLToPath(new URL('.',import.meta.url)));
+fs.mkdirSync('dist',{recursive:true});
+fs.copyFileSync('index.html','dist/index.html');
+fs.copyFileSync('../../math-gallery/diary/style.css','dist/style.css');
+fs.appendFileSync('dist/style.css','\n.account-panel{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:16px 24px;background:#f0e9dc;border-radius:16px}.account-panel p{margin:0;flex:1}');
+await build({absWorkingDir:fileURLToPath(new URL('.',import.meta.url)),entryPoints:['app.js'],bundle:true,minify:true,format:'esm',target:'es2022',outfile:'dist/app.js'});
+console.log('Diary production build ready');
